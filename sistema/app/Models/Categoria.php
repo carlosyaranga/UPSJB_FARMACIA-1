@@ -2,13 +2,23 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'description'])]
 class Categoria extends Model
 {
-   public function medicines (): HastMany
-   {
-    return $this->hasMany(Medicine::class);
-   }
+    use HasFactory;
+
+    protected $table = 'categorias';
+
+    protected $fillable = [
+        'nombre',
+        'descripcion',
+    ];
+
+    public function productos(): HasMany
+    {
+        return $this->hasMany(Producto::class, 'categoria_id');
+    }
 }

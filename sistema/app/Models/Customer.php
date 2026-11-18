@@ -7,8 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['nombre', 'dni', 'telefono', 'edad'])]
-class Cliente extends Model
+class Customer extends Model
 {
+    protected $table = 'clientes';
+
     public function ventas(): HasMany
     {
         return $this->hasMany(Venta::class);

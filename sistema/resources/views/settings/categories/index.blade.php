@@ -31,22 +31,22 @@
                 </thead>
                 <tbody>
                     @php
-                          $contador=1;
+                        $contador = 1;
                     @endphp
                     @foreach ($categories as $category)
                         <tr>
                             <td class="text-center align-middle">{{ $contador }}</td>
-                            <td class="text-start align-middle">{{ $category->name }}</td>
-                            <td class="text-start align-middle">{{ $category->description }}</td>
+                            <td class="text-start align-middle">{{ $category->nombre }}</td>
+                            <td class="text-start align-middle">{{ $category->descripcion }}</td>
                             <td class="text-center align-middle">
                                 <div class="dropdown">
                                     <button class="btn btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="{{ route('categories.edit', $category) }}">Editar</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('categories.edit', $category->id) }}">Editar</a></li>
                                         <li>
-                                            <form action="{{ route('categories.destroy', $category) }}" method="POST"
+                                            <form action="{{ route('categories.destroy', $category->id) }}" method="POST"
                                             onsubmit="return confirm('¿Estas seguro de eliminar este registro?')">
                                                 @csrf
                                                 @method('DELETE')
@@ -57,6 +57,9 @@
                                 </div>
                             </td>
                         </tr>
+                        @php
+                            $contador++;
+                        @endphp
                     @endforeach
                 </tbody>
             </table>

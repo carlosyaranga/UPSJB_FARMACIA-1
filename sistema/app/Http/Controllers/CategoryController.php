@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Categoria;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
     public function index()
     {
         $categories = Categoria::all();
+
         return view('settings.categories.index', compact('categories'));
     }
 
@@ -20,14 +22,14 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
+        $validated = $request->validate([
+            'name' => 'required|max:50|unique:categorias,nombre',
+            'description' => 'nullable|max:255',
         ]);
 
         Categoria::create([
-            'nombre' => $request->nombre,
-            'descripcion' => $request->descripcion,
+            'nombre' => $validated['name'],
+            'descripcion' => $validated['description'] ?? null,
         ]);
 
         return redirect()->route('categories.index')
@@ -46,14 +48,18 @@ class CategoryController extends Controller
 
     public function update(Request $request, Categoria $category)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'max:50',
+                Rule::unique('categorias', 'nombre')->ignore($category->id),
+            ],
+            'description' => 'nullable|max:255',
         ]);
 
         $category->update([
-            'nombre' => $request->nombre,
-            'descripcion' => $request->descripcion,
+            'nombre' => $validated['name'],
+            'descripcion' => $validated['description'] ?? null,
         ]);
 
         return redirect()->route('categories.index')
