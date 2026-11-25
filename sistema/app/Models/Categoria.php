@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'description'])]
+#[Fillable(['nombre', 'descripcion'])]
 class Categoria extends Model
 {
-   public function medicines (): HastMany
-   {
-    return $this->hasMany(Medicine::class);
-   }
+    protected $table = 'categorias';
+
+    public function medicamentos(): HasMany
+    {
+        return $this->hasMany(Medicamento::class);
+    }
 }
