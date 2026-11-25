@@ -1,6 +1,9 @@
+{{-- Formulario compartido por create y edit.
+     old('campo', $category->campo ?? '') muestra: lo que el usuario escribió si la validación falló,
+     o el valor guardado al editar, o vacío al crear. --}}
 <div class="mb-3">
-    <label for="name" class="form-label">Nombre de la categoria</label>
-    <input type="text" name="name" id="name"
+    <label for="name" class="form-label">Nombre de la categoría</label>
+    <input type="text" name="name" id="name" maxlength="50"
         class="form-control @error('name') is-invalid @enderror"
         value="{{ old('name', $category->nombre ?? '') }}">
     @error('name')
@@ -9,7 +12,7 @@
 </div>
 
 <div class="mb-3">
-    <label for="description" class="form-label">Descripcion</label>
+    <label for="description" class="form-label">Descripción</label>
     <textarea name="description" id="description" rows="3"
         class="form-control @error('description') is-invalid @enderror">
         {{ old('description', $category->descripcion ?? '') }}

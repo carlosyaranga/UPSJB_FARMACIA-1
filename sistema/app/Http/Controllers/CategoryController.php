@@ -2,24 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Categoria;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
+    // Listado de categorías (las más recientes primero)
     public function index()
     {
-        $categories = Categoria::all();
+        $categories = Categoria::latest()->get();
 
         return view('settings.categories.index', compact('categories'));
     }
 
+    // Formulario para crear
     public function create()
     {
         return view('settings.categories.create');
     }
 
+    // Guardar nueva categoría
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -32,21 +35,18 @@ class CategoryController extends Controller
             'descripcion' => $validated['description'] ?? null,
         ]);
 
-        return redirect()->route('categories.index')
-            ->with('success', 'Categoría registrada correctamente.');
+        // Patrón PRG: se redirige al listado con un mensaje flash
+        return to_route('categories.index')->with('ok', 'Categoría registrada');
     }
 
-    public function show(Categoria $category)
-    {
-        return view('settings.categories.show', compact('category'));
-    }
-
-    public function edit(Categoria $category)
+    // Formulario para editar
+    public function edit(Category $category)
     {
         return view('settings.categories.edit', compact('category'));
     }
 
-    public function update(Request $request, Categoria $category)
+    // Actualizar categoría (el nombre sigue siendo único, ignorando la propia)
+    public function update(Request $request, Category $category)
     {
         $validated = $request->validate([
             'name' => [
@@ -62,15 +62,20 @@ class CategoryController extends Controller
             'descripcion' => $validated['description'] ?? null,
         ]);
 
-        return redirect()->route('categories.index')
-            ->with('success', 'Categoría actualizada correctamente.');
+        return to_route('categories.index')->with('ok', 'Categoría actualizada');
     }
 
-    public function destroy(Categoria $category)
+    // Eliminar categoría (solo si no tiene medicamentos)
+    public function destroy(Category $category)
     {
+        // Regla del diagrama: la FK es restrictOnDelete(); se avisa antes de que MySQL lance el error 1451
+        if ($category->medicines()->exists()) {
+            return to_route('categories.index')
+                ->with('error', 'No se puede eliminar la categoría porque tiene medicamentos asociados');
+        }
+
         $category->delete();
 
-        return redirect()->route('categories.index')
-            ->with('success', 'Categoría eliminada correctamente.');
+        return to_route('categories.index')->with('ok', 'Categoría eliminada');
     }
 }

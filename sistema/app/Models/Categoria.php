@@ -21,4 +21,9 @@ class Categoria extends Model
     {
         return $this->hasMany(Producto::class, 'categoria_id');
     }
+
+    public function medicamentos(): HasMany
+    {
+        return $this->hasMany(Medicamento::class, 'categoria_id');
+    }
 }

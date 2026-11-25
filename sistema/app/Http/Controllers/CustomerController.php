@@ -31,8 +31,7 @@ class CustomerController extends Controller
 
         Customer::create($validated);
 
-        return redirect()->route('customer.index')
-            ->with('success', 'Cliente registrado correctamente.');
+        return to_route('customers.index')->with('ok', 'Cliente registrado');
     }
 
     public function show(Customer $customer)
@@ -60,15 +59,18 @@ class CustomerController extends Controller
 
         $customer->update($validated);
 
-        return redirect()->route('customer.index')
-            ->with('success', 'Cliente actualizado correctamente.');
+        return to_route('customers.index')->with('ok', 'Cliente actualizado');
     }
 
+    // Eliminar cliente (solo si no tiene ventas)
     public function destroy(Customer $customer)
     {
+        if ($customer->ventas()->exists()) {
+            return to_route('customers.index')->with('error', 'No se puede eliminar el cliente porque tiene ventas registradas');
+        }
+
         $customer->delete();
 
-        return redirect()->route('customer.index')
-            ->with('success', 'Cliente eliminado correctamente.');
+        return to_route('customers.index')->with('ok', 'Cliente eliminado');
     }
 }
