@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('categorias', function (Blueprint $table) {
-    $table->id();
-    $table->string('nombre', 80)->unique();
-    $table->string('descripcion')->nullable();
-    $table->timestamps();
-});
+        Schema::table('medicines', function (Blueprint $table) {
+            $table->date('expiry_date')->nullable()->after('stock');
+        });
     }
 
     /**
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categorias');
+        Schema::table('medicines', function (Blueprint $table) {
+            $table->dropColumn('expiry_date');
+        });
     }
 };

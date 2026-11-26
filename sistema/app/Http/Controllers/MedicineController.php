@@ -25,6 +25,13 @@ class MedicineController extends Controller
             ->when($request->boolean('low_stock'), function ($query) {    // solo si marcó "stock bajo"
                 $query->where('stock', '<=', self::LOW_STOCK);
             })
+            ->when($request->expiry_filter === 'expired', function ($query) {
+                $query->whereNotNull('expiry_date')->whereDate('expiry_date', '<', now()->toDateString());
+            })
+            ->when($request->expiry_filter === 'soon', function ($query) {
+                $query->whereNotNull('expiry_date')
+                    ->whereBetween('expiry_date', [now()->toDateString(), now()->addDays(30)->toDateString()]);
+            })
             ->orderBy('name')
             ->get();
 
@@ -32,7 +39,7 @@ class MedicineController extends Controller
         $categories = Category::orderBy('name')->get();
         $lowStock = self::LOW_STOCK;
 
-        return view('management.medicines.index', compact('medicines', 'categories', 'lowStock'));
+        return view('management.medicines.index', compact('medicines', 'categories') + ['lowStock' => self::LOW_STOCK]);
     }
 
     // Formulario para crear
@@ -51,6 +58,7 @@ class MedicineController extends Controller
             'name' => 'required|max:120',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'expiry_date' => 'nullable|date',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048', // máx. 2 MB
         ]);
 
@@ -80,6 +88,7 @@ class MedicineController extends Controller
             'name' => 'required|max:120',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'expiry_date' => 'nullable|date',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 

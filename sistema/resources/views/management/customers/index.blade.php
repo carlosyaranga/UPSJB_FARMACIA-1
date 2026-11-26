@@ -13,11 +13,18 @@
 @section('content')
 <div class="card bg-white border-0 shadow-sm border-5 border-top border-secondary">
     <div class="card-header bg-white">
-        <div class="row">
+        <div class="row g-2">
             <div class="col-12 col-md-3">
                 <a href="{{ route('customers.create') }}" class="btn btn-primary rounded-3 text-uppercase text-white w-100">
                     <i class="bi bi-plus-lg me-2"></i><span class="small fw-medium">Nuevo registro</span>
                 </a>
+            </div>
+            <div class="col-12 col-md-9">
+                <form method="GET" action="{{ route('customers.index') }}" class="d-flex gap-2">
+                    <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Buscar por nombre o DNI">
+                    <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i></button>
+                    <a class="btn btn-outline-secondary" href="{{ route('customers.index') }}"><i class="bi bi-x-lg"></i></a>
+                </form>
             </div>
         </div>
     </div>
@@ -27,31 +34,32 @@
 
         <h6 class="text-uppercase small text-muted mb-3">Total de registros encontrados: {{ $customers->count() }}</h6>
         <table id="display" class="table table-sm table-hover w-100 bg-white">
-            <thead>
-                <tr>
-                    <th class="text-center align-middle text-uppercase small">Nº</th>
-                    <th class="text-center align-middle text-uppercase small">Nombre</th>
-                    <th class="text-center align-middle text-uppercase small">DNI</th>
-                    <th class="text-center align-middle text-uppercase small">Teléfono</th>
-                    <th class="text-center align-middle text-uppercase small">Edad</th>
-                    <th class="text-center align-middle text-uppercase small">Acciones</th>
-                </tr>
-            </thead>
+            <thead><tr>
+                <th class="text-center text-uppercase small">Nº</th>
+                <th class="text-uppercase small">Nombre</th>
+                <th class="text-center text-uppercase small">DNI</th>
+                <th class="text-center text-uppercase small">Teléfono</th>
+                <th class="text-center text-uppercase small">Edad</th>
+                <th class="text-center text-uppercase small">Compras</th>
+                <th class="text-center text-uppercase small">Acciones</th>
+            </tr></thead>
             <tbody>
                 {{-- @forelse recorre la colección; si está vacía muestra el bloque @empty --}}
                 @forelse ($customers as $customer)
                 <tr>
                     <td class="text-center align-middle">{{ $loop->iteration }} {{-- 1, 2, 3... --}}</td>
-                    <td class="text-start align-middle">{{ $customer->name }}</td>
+                    <td class="align-middle">{{ $customer->name }}</td>
                     <td class="text-center align-middle">{{ $customer->dni }}</td>
                     <td class="text-center align-middle">{{ $customer->phone ?? '—' }}</td>
                     <td class="text-center align-middle">{{ $customer->age ?? '—' }}</td>
+                    <td class="text-center align-middle"><span class="badge bg-primary">{{ $customer->sales_count }}</span></td>
                     <td class="text-center align-middle">
                         <div class="dropdown">
                             <button class="btn btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-three-dots-vertical"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ route('customers.show', $customer) }}">Ver historial</a></li>
                                 <li><a class="dropdown-item" href="{{ route('customers.edit', $customer) }}">Editar</a></li>
                                 <li>
                                     <form action="{{ route('customers.destroy', $customer) }}" method="POST"
@@ -67,7 +75,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-3">No hay clientes registrados</td>
+                    <td colspan="7" class="text-center text-muted py-3">No hay clientes registrados</td>
                 </tr>
                 @endforelse
             </tbody>

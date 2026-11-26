@@ -13,7 +13,7 @@
         @enderror
     </div>
 
-    <div class="col-12 col-md-6 mb-3">
+    <div class="col-12 col-md-4 mb-3">
         <label for="role_id" class="form-label">Rol</label>
         {{-- Clave foránea: se guarda role_id, se muestra el nombre del rol --}}
         <select name="role_id" id="role_id" class="form-select @error('role_id') is-invalid @enderror">
@@ -27,6 +27,15 @@
         @error('role_id')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
+    </div>
+
+    <div class="col-12 col-md-2 mb-3 d-flex align-items-end">
+        <div class="form-check form-switch mb-2">
+            <input type="hidden" name="active" value="0">
+            <input type="checkbox" name="active" value="1" id="active" class="form-check-input"
+                @checked(old('active', $user->active ?? true))>
+            <label for="active" class="form-check-label">Activo</label>
+        </div>
     </div>
 
     <div class="col-12 col-md-4 mb-3">

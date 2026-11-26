@@ -11,10 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('medicamentos')) {
+            return;
+        }
+
         Schema::create('medicamentos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('categoria_id')->constrained()->restrictOnDelete();
-            $table->string('nombre',120);
+            $table->unsignedBigInteger('categoria_id')->nullable();
+            $table->string('nombre', 120);
             $table->decimal('precio', 10, 2);
             $table->unsignedInteger('stock')->default(0);
             $table->timestamps();

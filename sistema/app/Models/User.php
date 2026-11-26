@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['role_id', 'name', 'dni', 'phone', 'tuition', 'email', 'password'])]
+#[Fillable(['role_id', 'active', 'name', 'dni', 'phone', 'tuition', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -29,6 +29,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed', // la contraseña se encripta sola al guardar
+            'active' => 'boolean',
         ];
     }
 
@@ -41,7 +42,7 @@ class User extends Authenticatable
     // Comprueba si el usuario tiene alguno de los roles indicados.
     public function hasRole(string ...$roles): bool
     {
-        return $this->role()->whereIn('name', $roles)->exists();
+        return $this->active && $this->role()->whereIn('name', $roles)->exists();
     }
 
     // Un usuario registra muchas ventas

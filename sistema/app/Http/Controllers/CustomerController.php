@@ -9,9 +9,17 @@ use Illuminate\Validation\Rule;
 class CustomerController extends Controller
 {
     // Listado de clientes
-    public function index()
+    public function index(Request $request)
     {
-        $customers = Customer::latest()->get();
+        $customers = Customer::withCount('sales')
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('dni', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->get();
 
         return view('management.customers.index', compact('customers'));
     }
@@ -35,6 +43,16 @@ class CustomerController extends Controller
         Customer::create($validated);
 
         return to_route('customers.index')->with('ok', 'Cliente registrado');
+    }
+
+    // Mostrar historial de compras
+    public function show(Customer $customer)
+    {
+        $customer->load(['sales' => function ($query) {
+            $query->with(['user', 'details.medicine'])->latest('date');
+        }]);
+
+        return view('management.customers.show', compact('customer'));
     }
 
     // Formulario para editar

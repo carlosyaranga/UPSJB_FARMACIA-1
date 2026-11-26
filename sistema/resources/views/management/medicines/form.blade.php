@@ -31,7 +31,7 @@
         @enderror
     </div>
 
-    <div class="col-12 col-md-6 mb-3">
+    <div class="col-12 col-md-4 mb-3">
         <label for="price" class="form-label">Precio (S/)</label>
         <input type="number" name="price" id="price" step="0.01" min="0"
             class="form-control @error('price') is-invalid @enderror"
@@ -41,12 +41,22 @@
         @enderror
     </div>
 
-    <div class="col-12 col-md-6 mb-3">
+    <div class="col-12 col-md-4 mb-3">
         <label for="stock" class="form-label">Stock</label>
         <input type="number" name="stock" id="stock" step="1" min="0"
             class="form-control @error('stock') is-invalid @enderror"
             value="{{ old('stock', $medicine->stock ?? 0) }}">
         @error('stock')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+
+    <div class="col-12 col-md-4 mb-3">
+        <label for="expiry_date" class="form-label">Fecha de vencimiento</label>
+        <input type="date" name="expiry_date" id="expiry_date"
+            class="form-control @error('expiry_date') is-invalid @enderror"
+            value="{{ old('expiry_date', isset($medicine) && $medicine->expiry_date ? $medicine->expiry_date->format('Y-m-d') : '') }}">
+        @error('expiry_date')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>

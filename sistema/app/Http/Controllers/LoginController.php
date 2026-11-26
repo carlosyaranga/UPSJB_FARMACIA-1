@@ -23,9 +23,15 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        if (! Auth::attempt($validated, $request->boolean('remember'))) {
+        $credentials = [
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+            'active' => true,
+        ];
+
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
-                ->withErrors(['email' => 'El correo o la contraseña no son correctos.'])
+                ->withErrors(['email' => 'El correo o la contraseña no son correctos, o la cuenta está desactivada.'])
                 ->onlyInput('email');
         }
 

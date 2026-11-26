@@ -29,12 +29,13 @@
         <table id="display" class="table table-sm table-hover w-100 bg-white">
             <thead>
                 <tr>
-                    <th class="text-center align-middle text-uppercase small">Nº</th>
-                    <th class="text-center align-middle text-uppercase small">Fecha</th>
-                    <th class="text-center align-middle text-uppercase small">Cliente</th>
-                    <th class="text-center align-middle text-uppercase small">Vendedor</th>
-                    <th class="text-center align-middle text-uppercase small">Total</th>
-                    <th class="text-center align-middle text-uppercase small">Acciones</th>
+                    <th class="text-center text-uppercase small">Nº</th>
+                    <th class="text-center text-uppercase small">Fecha</th>
+                    <th class="text-center text-uppercase small">Cliente</th>
+                    <th class="text-center text-uppercase small">Vendedor</th>
+                    <th class="text-center text-uppercase small">Total</th>
+                    <th class="text-center text-uppercase small">Estado</th>
+                    <th class="text-center text-uppercase small">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,9 +44,14 @@
                 <tr>
                     <td class="text-center align-middle">{{ $loop->iteration }} {{-- 1, 2, 3... --}}</td>
                     <td class="text-center align-middle">{{ $sale->date->format('d/m/Y H:i') }}</td>
-                    <td class="text-start align-middle">{{ $sale->customer->name }}</td>
-                    <td class="text-start align-middle">{{ $sale->user->name }}</td>
+                    <td class="align-middle">{{ $sale->customer->name }}</td>
+                    <td class="align-middle">{{ $sale->user->name }}</td>
                     <td class="text-end align-middle">S/ {{ number_format($sale->total, 2) }}</td>
+                    <td class="text-center align-middle">
+                        <span class="badge {{ $sale->isCancelled() ? 'bg-danger' : 'bg-success' }}">
+                            {{ $sale->isCancelled() ? 'Anulada' : 'Activa' }}
+                        </span>
+                    </td>
                     <td class="text-center align-middle">
                         <div class="dropdown">
                             <button class="btn btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -53,21 +59,26 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="{{ route('sales.show', $sale) }}">Ver detalle</a></li>
-                                <li>
-                                    <form action="{{ route('sales.destroy', $sale) }}" method="POST"
-                                        onsubmit="return confirm('¿Seguro que desea anular esta venta? El stock será devuelto.')">
-                                        @csrf
-                                        @method('DELETE') {{-- verbo real: destroy() --}}
-                                        <button type="submit" class="dropdown-item text-danger">Anular</button>
-                                    </form>
-                                </li>
+                                @if (! $sale->isCancelled())
+                                    <li><a class="dropdown-item" href="{{ route('sales.edit', $sale) }}">Editar</a></li>
+                                    @if (auth()->user()->hasRole('Administrador'))
+                                        <li>
+                                            <form action="{{ route('sales.destroy', $sale) }}" method="POST"
+                                                onsubmit="return confirm('¿Anular esta venta y devolver el stock?')">
+                                                @csrf
+                                                @method('DELETE') {{-- verbo real: destroy() --}}
+                                                <button type="submit" class="dropdown-item text-danger">Anular</button>
+                                            </form>
+                                        </li>
+                                    @endif
+                                @endif
                             </ul>
                         </div>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-3">No hay ventas registradas</td>
+                    <td colspan="7" class="text-center text-muted py-3">No hay ventas registradas</td>
                 </tr>
                 @endforelse
             </tbody>

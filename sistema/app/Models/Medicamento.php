@@ -2,30 +2,38 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['categoria_id', 'nombre', 'precio', 'stock'])]
 class Medicamento extends Model
 {
+    protected $table = 'medicines';
+
+    protected $fillable = [
+        'category_id',
+        'name',
+        'price',
+        'stock',
+        'image',
+    ];
+
     protected function casts(): array
     {
         return [
-            'precio' => 'decimal:2',
+            'price' => 'decimal:2',
             'stock' => 'integer',
         ];
     }
 
-    public function categoria(): BelongsTo
+    public function category(): BelongsTo
     {
-        return $this->belongsTo(Categoria::class);
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
-    public function detallesVenta(): HasMany
+    public function saleDetails(): HasMany
     {
-        return $this->hasMany(DetalleVenta::class);
+        return $this->hasMany(DetailSale::class, 'medicine_id');
     }
 
     public function actualizarStock(int $cantidad): void

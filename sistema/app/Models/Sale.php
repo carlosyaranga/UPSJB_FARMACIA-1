@@ -7,13 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['user_id', 'customer_id', 'date', 'total', 'igv'])]
+#[Fillable(['user_id', 'customer_id', 'date', 'total', 'igv', 'status', 'cancelled_at'])]
 class Sale extends Model
 {
     protected function casts(): array
     {
         return [
             'date' => 'datetime',
+            'cancelled_at' => 'datetime',
         ];
     }
 
@@ -33,5 +34,10 @@ class Sale extends Model
     public function details(): HasMany
     {
         return $this->hasMany(DetailSale::class);
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === 'cancelled';
     }
 }

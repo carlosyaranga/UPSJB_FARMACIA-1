@@ -29,13 +29,14 @@
         <table id="display" class="table table-sm table-hover w-100 bg-white">
             <thead>
                 <tr>
-                    <th class="text-center align-middle text-uppercase small">Nº</th>
-                    <th class="text-center align-middle text-uppercase small">Nombre</th>
-                    <th class="text-center align-middle text-uppercase small">DNI</th>
-                    <th class="text-center align-middle text-uppercase small">Correo</th>
-                    <th class="text-center align-middle text-uppercase small">Teléfono</th>
-                    <th class="text-center align-middle text-uppercase small">Rol</th>
-                    <th class="text-center align-middle text-uppercase small">Acciones</th>
+                    <th class="text-center text-uppercase small">Nº</th>
+                    <th class="text-uppercase small">Nombre</th>
+                    <th class="text-center text-uppercase small">DNI</th>
+                    <th class="text-uppercase small">Correo</th>
+                    <th class="text-center text-uppercase small">Teléfono</th>
+                    <th class="text-center text-uppercase small">Rol</th>
+                    <th class="text-center text-uppercase small">Estado</th>
+                    <th class="text-center text-uppercase small">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,11 +44,16 @@
                 @forelse ($users as $user)
                 <tr>
                     <td class="text-center align-middle">{{ $loop->iteration }} {{-- 1, 2, 3... --}}</td>
-                    <td class="text-start align-middle">{{ $user->name }}</td>
+                    <td class="align-middle">{{ $user->name }}</td>
                     <td class="text-center align-middle">{{ $user->dni }}</td>
-                    <td class="text-start align-middle">{{ $user->email }}</td>
+                    <td class="align-middle">{{ $user->email }}</td>
                     <td class="text-center align-middle">{{ $user->phone ?? '—' }}</td>
-                    <td class="text-center align-middle">{{ $user->role->name }}</td>
+                    <td class="text-center align-middle">{{ $user->role?->name }}</td>
+                    <td class="text-center align-middle">
+                        <span class="badge {{ $user->active ? 'bg-success' : 'bg-secondary' }}">
+                            {{ $user->active ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </td>
                     <td class="text-center align-middle">
                         <div class="dropdown">
                             <button class="btn btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -69,7 +75,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="text-center text-muted py-3">No hay usuarios registrados</td>
+                    <td colspan="8" class="text-center text-muted py-3">No hay usuarios registrados</td>
                 </tr>
                 @endforelse
             </tbody>

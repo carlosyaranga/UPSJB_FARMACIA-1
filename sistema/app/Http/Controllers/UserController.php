@@ -30,6 +30,7 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'role_id' => 'required|exists:roles,id',
+            'active' => 'sometimes|boolean',
             'name' => 'required|max:255',
             'dni' => 'required|digits:8|unique:users',
             'phone' => 'nullable|max:15',
@@ -38,6 +39,7 @@ class UserController extends Controller
             'password' => 'required|min:8|confirmed', // confirmed: debe coincidir con password_confirmation
         ]);
 
+        $validated['active'] = $request->boolean('active');
         User::create($validated); // el cast 'hashed' del modelo encripta la contraseña al guardar
 
         return to_route('users.index')->with('ok', 'Usuario registrado');
@@ -56,6 +58,7 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'role_id' => 'required|exists:roles,id',
+            'active' => 'sometimes|boolean',
             'name' => 'required|max:255',
             'dni' => ['required', 'digits:8', Rule::unique('users')->ignore($user->id)],
             'phone' => 'nullable|max:15',
@@ -63,6 +66,8 @@ class UserController extends Controller
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|min:8|confirmed',
         ]);
+
+        $validated['active'] = $request->boolean('active');
 
         // Si no escribió contraseña nueva, se mantiene la actual
         if (empty($validated['password'])) {
@@ -75,8 +80,12 @@ class UserController extends Controller
     }
 
     // Eliminar usuario (solo si no tiene ventas)
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
+        if ($request->user()->is($user)) {
+            return to_route('users.index')->with('error', 'No puede eliminar su propia cuenta');
+        }
+
         if ($user->sales()->exists()) {
             return to_route('users.index')->with('error', 'No se puede eliminar el usuario porque tiene ventas registradas');
         }

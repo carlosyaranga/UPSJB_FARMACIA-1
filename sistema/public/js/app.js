@@ -17,13 +17,11 @@ function initSidebarToggle() {
     btn.addEventListener('click', () => {
       if (isDesktop()) {
         sidebar.classList.toggle('sidebar-collapsed');
+      } else if (sidebar.classList.contains('sidebar-open')) {
+        closeMobile();
       } else {
-        if (sidebar.classList.contains('sidebar-open')) {
-          closeMobile();
-        } else {
-          sidebar.classList.add('sidebar-open');
-          overlay.classList.add('show');
-        }
+        sidebar.classList.add('sidebar-open');
+        overlay.classList.add('show');
       }
     });
   });
@@ -55,8 +53,79 @@ function initTooltips() {
   });
 }
 
+let deferredInstallPrompt = null;
+
+function initPwaInstall() {
+  const installButton = document.getElementById('installApplication');
+  if (!installButton) return;
+
+  const isInstalled = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+
+  if (isInstalled) {
+    installButton.classList.add('d-none');
+  }
+
+  window.addEventListener('beforeinstallprompt', event => {
+    event.preventEvent?.();
+    event.preventDefault();
+    deferredInstallPrompt = event;
+
+    if (!isInstalled) {
+      installButton.classList.remove('d-none');
+      installButton.title = 'Instalar Farmacia San Juan Bautista';
+    }
+  });
+
+  installButton.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) {
+      alert('La instalación no está disponible en este navegador o ya fue ofrecida. Use el menú de Chrome: Instalar aplicación.');
+      return;
+    }
+
+    await deferredInstallPrompt.prompt();
+    const result = await deferredInstallPrompt.userChoice;
+
+    if (result.outcome === 'accepted') {
+      installButton.classList.add('d-none');
+    }
+
+    deferredInstallPrompt = null;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    installButton.classList.add('d-none');
+    deferredInstallPrompt = null;
+  });
+}
+
+function initConnectionGuard() {
+  const offlineAlert = document.getElementById('offlineAlert');
+
+  function updateConnectionState() {
+    if (!navigator.onLine) {
+      offlineAlert?.classList.remove('d-none');
+    } else {
+      offlineAlert?.classList.add('d-none');
+    }
+  }
+
+  window.addEventListener('online', updateConnectionState);
+  window.addEventListener('offline', updateConnectionState);
+  updateConnectionState();
+
+  document.addEventListener('submit', event => {
+    if (!navigator.onLine) {
+      event.preventDefault();
+      alert('Sin conexión. Las ventas y cambios de inventario no se pueden registrar. Restaure la conexión e intente nuevamente.');
+    }
+  }, true);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initSidebarToggle();
   initUserDropdown();
   initTooltips();
+  initPwaInstall();
+  initConnectionGuard();
 });

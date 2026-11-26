@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('detalle_ventas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('venta_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('medicamento_id')->constrained()->restrictOnDelete();
+            $table->unsignedBigInteger('venta_id');
+            $table->unsignedBigInteger('medicamento_id');
             $table->unsignedInteger('cantidad');
             $table->decimal('precio_unitario', 10, 2);
             $table->decimal('subtotal', 10, 2);

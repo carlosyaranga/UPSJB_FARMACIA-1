@@ -16,18 +16,23 @@
         @include('partials.alerts')
 
         <div class="row mb-3">
-            <div class="col-12 col-md-4 mb-2">
+            <div class="col-12 col-md-3 mb-2">
                 <small class="text-muted d-block">Venta Nº</small>
-                {{-- str_pad: 7 se muestra como 000007 --}}
                 <span class="fw-semibold">{{ str_pad($sale->id, 6, '0', STR_PAD_LEFT) }}</span>
             </div>
-            <div class="col-12 col-md-4 mb-2">
+            <div class="col-12 col-md-3 mb-2">
                 <small class="text-muted d-block">Fecha</small>
                 <span class="fw-semibold">{{ $sale->date->format('d/m/Y H:i') }}</span>
             </div>
-            <div class="col-12 col-md-4 mb-2">
+            <div class="col-12 col-md-3 mb-2">
                 <small class="text-muted d-block">Vendedor</small>
                 <span class="fw-semibold">{{ $sale->user->name }}</span>
+            </div>
+            <div class="col-12 col-md-3 mb-2">
+                <small class="text-muted d-block">Estado</small>
+                <span class="badge {{ $sale->isCancelled() ? 'bg-danger' : 'bg-success' }}">
+                    {{ $sale->isCancelled() ? 'Anulada' : 'Activa' }}
+                </span>
             </div>
             <div class="col-12 col-md-4 mb-2">
                 <small class="text-muted d-block">Cliente</small>
@@ -77,6 +82,9 @@
             </tfoot>
         </table>
 
+        @if (! $sale->isCancelled())
+        <a href="{{ route('sales.edit', $sale) }}" class="btn btn-primary text-white">Editar venta</a>
+        @endif
         <a href="{{ route('sales.index') }}" class="btn btn-secondary">Volver</a>
     </div>
 </div>
